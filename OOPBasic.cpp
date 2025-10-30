@@ -204,7 +204,96 @@ private:
     //
 };
 
+class Triangle;
+class Figure;// Базовй класс для фигур - 3 голоса
+             // Просто какой то формы фигура - 0 голосов
+class Circle;
+class Rectangle;
+
+class Figure {
+public:
+    virtual double Square()const = 0;
+    virtual double Perimetr()const = 0;
+    //Такая запись делает метод чистым виртуальным методом
+    //Класс в таком случае превращается в абстрактный класс
+    // Абстарктные классы не могут иметь собственных объектов.
+    // В коде на C++ абстрактные классы которые содержат в себе
+    // исключительно чистые виртуальные методы принято называть
+    // интерфейсам
+    
+    virtual ~Figure() = default;
+    //виртуальный деструктор по умолчанию нужен нам для корректного
+    //управления памятью объектов в будущем
+};
+
+class Triangle:public Figure {
+public:
+    Triangle(const Point2D& a, const Point2D& b, const Point2D& c)
+    {
+        points_[0] = a;
+        points_[1] = b;
+        points_[2] = c;
+    }
+    void SetA(const Point2D& a) {
+        points_[0] = a;
+    }
+    void SetB(const Point2D& b) {
+        points_[1] = b;
+    }
+    void SetC(const Point2D& c) {
+        points_[2] = c;
+    }
+
+    Point2D GetA()const { return points_[0]; }
+    Point2D GetB()const { return points_[1]; }
+    Point2D GetC()const { return points_[2]; }
+
+    double Perimetr()const override {
+        double res{};
+        res += points_[0].Shift(points_[1]);
+        res += Point2D::Shift(points_[1], points_[2]);
+        res += Point2D::Shift(points_[2], points_[0]);
+        return res;
+    }
+
+    double Square()const override {
+        //S = 0.5 * | x1(y2-y3) + x2(y3-y1) + x3(y1-y2) |
+        //  | модуль | - ::abs() из библиотеки cmath
+        
+        return 0.5 * ::abs(
+            points_[0].GetX() * 
+                (points_[1].GetY() - points_[2].GetY()) +
+            points_[1].GetX() * 
+                (points_[2].GetY() - points_[1].GetY()) +
+            points_[2].GetX() * 
+                (points_[0].GetY() - points_[1].GetY()));
+    }
+private:
+    Point2D points_[3];
+};
+
+class Rectange :public Figure {
+private:
+    Point2D points_[4];
+};
+class Circle : public Figure {
+private:
+    Point2D centre_;
+    Segment radius_;
+};
+//Задание 1
+// По аналогии с треугольником сделать прямоугольник
+//  * проверяйте что углы прямые при создании или изменении сторон
+//Задание 2
+// подумайте надо ли хранить отдельно точку центра у круга
+// реализуйте класс круга но учтите что метод получения 
+//      центральной точки должен присутствовать независимо от того 
+//      оставите ли вы её в полях класса
+//
+
 int main(){
+    //Figure r;
+    
     const Point2D a{ 1.2,4.5 };
     Point2D b{ 3.,5. };
 
@@ -220,5 +309,12 @@ int main(){
     line[1] = b;
     Point2D c{ 4.,6. };
     line.PushBack(c);
+
+    Triangle tr{ a,b,c };
 }
 
+//Занимаемся - 1 человека
+//
+//Выходной   - 3
+//
+//2 - сомневаются
